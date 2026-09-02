@@ -27,6 +27,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 安裝 OCR 工具
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr
+
+      - name: 辨識圖片文字
+        run: python ocr.py
+
       - name: 抓取並重新計算
         run: python build.py
 
@@ -34,7 +42,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json
+          git add data.json ocr.json
           if git diff --cached --quiet; then
             echo "資料沒有變化，不提交。"
           else
