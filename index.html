@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>5,417 則貼文裡的台灣</title>
+<title>川普貼文裡的台灣</title>
 <meta name="description" content="川普 Truth Social 貼文即時分析器。全文可搜尋、可自訂關鍵字看趨勢。我是地球人彭光偉。">
 <meta name="author" content="彭光偉">
 <meta property="og:url" content="https://charltonpeng1023.github.io/trump-truth-2026/">
@@ -11,7 +11,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="我是地球人彭光偉">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:title" content="5,417 則貼文裡的台灣">
+<meta property="og:title" content="川普貼文裡的台灣">
 <meta property="og:description" content="川普 Truth Social 貼文即時分析器。全文可搜尋、可自訂關鍵字看趨勢。">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -324,9 +324,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
   });
   var days = [], d0 = new Date(D.range[0] + 'T00:00:00'), d1 = new Date(D.range[1] + 'T00:00:00');
   for (var d = new Date(d0); d <= d1; d.setDate(d.getDate()+1)){
-    // 用本地日期組字串，不能用 toISOString：在 UTC+8 會整批位移一天
-    var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') +
-              '-' + String(d.getDate()).padStart(2,'0');
+    var key = d.toISOString().slice(0,10);
     days.push([key, D.daily[key] || 0]);
   }
   var maxDay = days.reduce(function(m,x){ return Math.max(m, x[1]); }, 1);
@@ -334,7 +332,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
   var noPost = days.filter(function(x){ return x[1] === 0; }).length;
   var busiest = days.slice().sort(function(a,b){ return b[1]-a[1]; })[0];
   var defaultReadout = '這段期間共 ' + days.length + ' 天，其中 ' + noPost +
-    ' 天完全沒發文。單日最高紀錄是 ' + busiest[0].slice(5).replace('-',' 月 ') + ' 日的 ' + busiest[1] + ' 則。';
+    ' 天完全沒發文。單日最高紀錄是 ' + (+busiest[0].slice(5,7)) + ' 月 ' + (+busiest[0].slice(8,10)) + ' 日的 ' + busiest[1] + ' 則。';
   readout.textContent = defaultReadout;
   var frag = document.createDocumentFragment();
   days.forEach(function(x){
