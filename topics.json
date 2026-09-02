@@ -6,7 +6,7 @@
       "topics": [
         { "label": "台灣", "pattern": "\\btaiwan|\\btaiwanese\\b|\\btsmc\\b|taipei economic", "alert": true },
         { "label": "中國", "pattern": "\\bchina\\b|\\bchinese\\b|\\bbeijing\\b|\\bccp\\b" },
-        { "label": "伊朗", "pattern": "\\biran\\b|\\biranian\\b|\\btehran\\b|islamic republic" },
+        { "label": "伊朗", "pattern": "\\biran\\b|\\biranian\\b|\\btehran\\b|islamic republic", "alert": true },
         { "label": "以色列", "pattern": "\\bisrael" },
         { "label": "加薩與巴勒斯坦", "pattern": "\\bgaza\\b|\\bhamas\\b|palestin|\\bwest bank\\b" },
         { "label": "俄羅斯", "pattern": "\\brussia|\\bmoscow\\b|\\bkremlin\\b" },
