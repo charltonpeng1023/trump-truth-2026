@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>川普貼文裡的台灣</title>
-<meta name="description" content="川普 Truth Social 貼文即時分析器。全文可搜尋、可自訂關鍵字看趨勢。我是地球人彭光偉。">
+<meta name="description" content="川普 Truth Social 貼文即時追蹤。77 個主題逐月統計、全文檢索、自訂關鍵字趨勢圖，提到台灣或半導體時自動警示。我是地球人彭光偉。">
 <meta name="author" content="彭光偉">
 <meta property="og:url" content="https://charltonpeng1023.github.io/trump-truth-2026/">
 <meta property="og:image" content="https://charltonpeng1023.github.io/trump-truth-2026/og.png">
@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="我是地球人彭光偉">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:title" content="川普貼文裡的台灣">
-<meta property="og:description" content="川普 Truth Social 貼文即時分析器。全文可搜尋、可自訂關鍵字看趨勢。">
+<meta property="og:description" content="每 6 小時自動更新。77 個主題逐月統計、全文檢索、自訂關鍵字趨勢圖，提到台灣或半導體時自動警示。">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -171,6 +171,18 @@ select{font:inherit;font-size:13.5px;padding:9px 11px;background:var(--surface);
 .err{padding:26px;background:var(--accent-soft);border-left:3px solid var(--accent);
      color:var(--ink);font-size:14.5px}
 
+.alert{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:26px 0 0;
+       padding:16px 18px;border-left:3px solid var(--accent);background:var(--accent-soft);
+       font-size:14.5px;color:var(--ink)}
+.alert .who{color:var(--accent);font-weight:700;letter-spacing:.06em;font-size:12.5px}
+.alert button{font:inherit;font-size:13px;padding:6px 14px;border:1px solid var(--accent);
+              background:transparent;color:var(--accent);cursor:pointer;border-radius:999px}
+.alert button:hover{background:var(--accent);color:#fff}
+.alert.quiet{border-left-color:var(--rule-2);background:var(--surface-2);color:var(--ink-2)}
+.alert.quiet .who{color:var(--ink-3)}
+.alert.quiet button{border-color:var(--rule-2);color:var(--ink-2)}
+.alert.quiet button:hover{background:var(--ink-2);color:var(--paper);border-color:var(--ink-2)}
+.chip.watch::before{content:"\25CF";color:var(--accent);margin-right:6px;font-size:9px;vertical-align:2px}
 footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);font-size:12.5px;
        color:var(--ink-3);line-height:1.8}
 footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
@@ -199,9 +211,9 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
         <span class="brandtag">從現場看懂世界</span>
       </div>
     </div>
-    <p class="eyebrow">資料新聞 · Truth Social 即時分析器</p>
-    <h1>川普貼文裡的<em>台灣</em></h1>
-    <p class="dek">這個頁面每 6 小時自動重抓一次川普 Truth Social 的全部貼文，重新計算。全文可搜尋，趨勢圖可以自己輸入任何關鍵字。</p>
+    <p class="eyebrow">資料新聞 · Truth Social 全文追蹤</p>
+    <h1>川普貼文<em>追蹤器</em></h1>
+    <p class="dek">川普每天在 Truth Social 發 20 幾則貼文。這個頁面每 6 小時自動重抓一次全部貼文，77 個主題逐月統計，全文可搜尋，趨勢圖可以自己輸入任何關鍵字。只要他提到台灣或半導體，頁面頂端會跳出警示。</p>
     <div class="byline" id="byline">
       <span class="live"><i></i>資料載入中</span>
     </div>
@@ -269,10 +281,43 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
   var top1 = countryTops[0] || ['—', 0];
   var perDay = (POSTS.length / Math.max(1, D.days_span)).toFixed(1);
 
-  var html = '<div class="stats">' +
-    stat(POSTS.length.toLocaleString(), '區間內貼文則數') +
+  // 警示主題由 topics.json 的 alert 旗標決定，改設定檔就會跟著換
+  var ALERT_IDX = [], ALERT_NAMES = [];
+  TOPICS.forEach(function(t,i){ if (t.alert){ ALERT_IDX.push(i); ALERT_NAMES.push(t.label); } });
+  function isAlert(p){
+    for (var i=0;i<ALERT_IDX.length;i++) if (p[7].indexOf(ALERT_IDX[i]) >= 0) return true;
+    return false;
+  }
+  var alertPosts = POSTS.filter(isAlert);
+  var WINDOW_H = 72;
+  var sinceD = new Date(Date.now() - WINDOW_H*3600e3);
+  var sinceKey = sinceD.getFullYear() + '-' + String(sinceD.getMonth()+1).padStart(2,'0') +
+                 '-' + String(sinceD.getDate()).padStart(2,'0');
+  var recentAlerts = alertPosts.filter(function(p){ return p[1].slice(0,10) >= sinceKey; });
+  function md(s){ return (+s.slice(5,7)) + ' 月 ' + (+s.slice(8,10)) + ' 日'; }
+  function banner(){
+    if (!ALERT_NAMES.length) return '';
+    var who = ALERT_NAMES.join('、');
+    if (recentAlerts.length)
+      return '<div class="alert"><span class="who">警示</span><span>過去 ' + WINDOW_H +
+        ' 小時內有 <b>' + recentAlerts.length + '</b> 則貼文提到' + esc(who) +
+        '</span><button type="button" id="jumpAlert">看這幾則</button></div>';
+    if (!alertPosts.length)
+      return '<div class="alert quiet"><span class="who">警示</span><span>這段期間沒有任何貼文提到' +
+        esc(who) + '</span></div>';
+    return '<div class="alert quiet"><span class="who">警示</span><span>目前沒有新警示。最近一次提到' +
+      esc(who) + '是 <b>' + md(alertPosts[0][1]) + '</b>，這段期間共 ' + alertPosts.length +
+      ' 則</span><button type="button" id="jumpAlert">看全部</button></div>';
+  }
+
+  var d7 = new Date(Date.now() - 7*864e5);
+  var key7 = d7.getFullYear() + '-' + String(d7.getMonth()+1).padStart(2,'0') +
+             '-' + String(d7.getDate()).padStart(2,'0');
+  var last7 = POSTS.filter(function(p){ return p[1].slice(0,10) >= key7; }).length;
+  var html = banner() + '<div class="stats">' +
+    stat(POSTS.length.toLocaleString(), '追蹤中貼文則數') +
     stat(perDay, '平均每天則數') +
-    stat(twTotal, '提到台灣的則數', true) +
+    stat(last7.toLocaleString(), '最近 7 天則數') +
     stat(top1[1].toLocaleString(), '提到' + top1[0] + '的則數') +
     stat((mediaOnly/POSTS.length*100).toFixed(1) + '%', '完全沒有文字的貼文') +
     '</div>';
@@ -283,7 +328,8 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
 
   html +=
    '<section><h2>每一根是一天</h2>' +
-   '<p class="sub">高度是當天發文則數。紅色標記的是提到台灣的日子。滑過任何一根看細節。</p>' +
+   '<p class="sub">高度是當天發文則數。紅色標記的是提到警示主題（' + esc(ALERT_NAMES.join('、')) +
+   '）的日子。滑過任何一根看細節。</p>' +
    '<div class="panel"><div class="ticks" id="ticks"></div>' +
    '<div class="striplabels"><span>' + D.range[0] + '</span><span>' + D.range[1] + '</span></div>' +
    '<div class="readout" id="readout"></div></div></section>' +
@@ -319,9 +365,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
 
   /* ---------- 日條圖 ---------- */
   var twDays = {};
-  if (TWIDX >= 0) POSTS.forEach(function(p){
-    if (p[7].indexOf(TWIDX) >= 0) twDays[p[1].slice(0,10)] = 1;
-  });
+  alertPosts.forEach(function(p){ twDays[p[1].slice(0,10)] = 1; });
   var days = [], d0 = new Date(D.range[0] + 'T00:00:00'), d1 = new Date(D.range[1] + 'T00:00:00');
   for (var d = new Date(d0); d <= d1; d.setDate(d.getDate()+1)){
     // 用本地日期組字串，不能用 toISOString：在 UTC+8 會整批位移一天
@@ -349,7 +393,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
     var t = e.target.closest('.tick'); if (!t) return;
     var pp = t.dataset.d.split('-');
     readout.innerHTML = '<b>' + (+pp[1]) + ' 月 ' + (+pp[2]) + ' 日</b>　' + t.dataset.n + ' 則貼文' +
-      (twDays[t.dataset.d] ? ' <span class="tag">這天提到台灣</span>' : '');
+      (twDays[t.dataset.d] ? ' <span class="tag">這天提到警示主題</span>' : '');
   });
   ticks.addEventListener('mouseleave', function(){ readout.textContent = defaultReadout; });
 
@@ -410,6 +454,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
       b.innerHTML = esc(l) + '<span class="ct">' +
         MON.reduce(function(a,k){ return a + (monthlyFor(l)[k]||0); },0) + '</span>';
       if (l === '台灣') b.setAttribute('data-tw','1');
+      if (ALERT_NAMES.indexOf(l) >= 0) b.classList.add('watch');
       b.setAttribute('aria-pressed', selected.indexOf(l) >= 0 ? 'true' : 'false');
       b.dataset.label = l;
       b.addEventListener('click', function(){ toggle(l); });
@@ -466,6 +511,11 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
 
   /* ---------- 全文檢索 ---------- */
   var topicSel = document.getElementById('topic');
+  if (ALERT_IDX.length){
+    var oa = document.createElement('option');
+    oa.value = '-2'; oa.textContent = '★ 只看警示主題（' + ALERT_NAMES.join('、') + '）';
+    topicSel.appendChild(oa);
+  }
   GROUPS.forEach(function(g){
     var og = document.createElement('optgroup'); og.label = g;
     TOPICS.forEach(function(t,i){
@@ -496,6 +546,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
     var lower = term.toLowerCase(), ti = +topicSel.value, ki = +kindSel.value, mo = monthSel.value;
     filtered = POSTS.filter(function(p){
       if (lower && (!p[2] || p[2].toLowerCase().indexOf(lower) < 0)) return false;
+      if (ti === -2 && !isAlert(p)) return false;
       if (ti >= 0 && p[7].indexOf(ti) < 0) return false;
       if (ki >= 0 && p[3] !== ki) return false;
       if (mo && p[1].slice(0,7) !== mo) return false;
@@ -541,6 +592,14 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
   [topicSel, monthSel, kindSel, sortSel].forEach(function(el){ el.addEventListener('change', apply); });
   moreBtn.addEventListener('click', render);
   apply();
+
+  var jump = document.getElementById('jumpAlert');
+  if (jump) jump.addEventListener('click', function(){
+    q.value = ''; kindSel.value = '-1'; monthSel.value = ''; sortSel.value = 'new';
+    topicSel.value = '-2';
+    apply();
+    document.getElementById('count').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 })();
 </script>
 </body>

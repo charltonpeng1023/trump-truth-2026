@@ -1,10 +1,10 @@
 {
-  "_說明": "主題關鍵字設定檔。要新增主題，在對應的 group 裡加一筆 {label, pattern} 就好，不用改程式。pattern 是正規表達式，預設不分大小寫；需要區分大小寫（例如 ICE）就加 \"cs\": true。改完 commit，下次自動更新就會生效。",
+  "_說明": "主題關鍵字設定檔。要新增主題，在對應的 group 裡加一筆 {label, pattern} 就好，不用改程式。pattern 是正規表達式，預設不分大小寫；需要區分大小寫（例如 ICE）就加 \"cs\": true；要在川普一提到就收到警示，加 \"alert\": true。改完 commit，下次自動更新就會生效。",
   "groups": [
     {
       "name": "國家與地區",
       "topics": [
-        { "label": "台灣", "pattern": "\\btaiwan|\\btaiwanese\\b|\\btsmc\\b|taipei economic" },
+        { "label": "台灣", "pattern": "\\btaiwan|\\btaiwanese\\b|\\btsmc\\b|taipei economic", "alert": true },
         { "label": "中國", "pattern": "\\bchina\\b|\\bchinese\\b|\\bbeijing\\b|\\bccp\\b" },
         { "label": "伊朗", "pattern": "\\biran\\b|\\biranian\\b|\\btehran\\b|islamic republic" },
         { "label": "以色列", "pattern": "\\bisrael" },
@@ -36,7 +36,7 @@
       "name": "議題",
       "topics": [
         { "label": "關稅與貿易", "pattern": "\\btariff|trade deficit|trade deal|section 232|reciprocal trade|\\bimports?\\b" },
-        { "label": "半導體與晶片", "pattern": "semiconductor|\\bchips?\\b|\\bfoundry\\b|\\bwafer\\b|\\bintel\\b|\\bnvidia\\b|\\bmicron\\b" },
+        { "label": "半導體與晶片", "pattern": "semiconductor|\\bchips?\\b|\\bwafer\\b|\\bnvidia\\b|\\bmicron\\b|\\btsmc\\b", "alert": true },
         { "label": "期中選舉", "pattern": "\\bmidterm|primary election|congressional district|running for (the )?(u\\.s\\.|united states )?(senate|congress|governor)|\\bballot\\b|\\bvoters?\\b" },
         { "label": "最高法院", "pattern": "supreme court|\\bscotus\\b|gorsuch|barrett|kavanaugh" },
         { "label": "移民與遣返", "pattern": "\\bimmigration\\b|\\bimmigrant|deportation|deport\\b|illegal alien|\\bmigrant|border patrol|birthright citizenship" },

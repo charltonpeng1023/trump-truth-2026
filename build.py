@@ -42,7 +42,7 @@ def compile_topics(cfg: dict):
             except re.error as e:
                 print(f"  略過主題「{t['label']}」：正規表達式有誤 {e}", file=sys.stderr)
                 continue
-            out.append((group["name"], t["label"], rx))
+            out.append((group["name"], t["label"], rx, bool(t.get("alert"))))
     return out
 
 
@@ -81,7 +81,7 @@ def main() -> int:
 
         # 主題以索引陣列儲存，不用位元遮罩：主題數已超過 JavaScript
         # 位元運算的 32 位元上限，用陣列才不會在瀏覽器端算錯。
-        hits = [i for i, (_g, _l, rx) in enumerate(topics) if text and rx.search(text)]
+        hits = [i for i, (_g, _l, rx, _a) in enumerate(topics) if text and rx.search(text)]
 
         flags = 0
         if re.match(r"^RT @", text):
@@ -112,7 +112,7 @@ def main() -> int:
     # 逐月統計：每個主題一組，外加總則數
     months = sorted({p[1][:7] for p in posts})
     monthly = {"__all__": {m: 0 for m in months}}
-    for _g, label, _rx in topics:
+    for _g, label, _rx, _a in topics:
         monthly[label] = {m: 0 for m in months}
     for p in posts:
         m = p[1][:7]
@@ -135,7 +135,7 @@ def main() -> int:
         "archive_total": len(raw),
         "range": [posts[-1][1][:10], posts[0][1][:10]],
         "days_span": days_span,
-        "topics": [{"group": g, "label": l} for g, l, _ in topics],
+        "topics": [{"group": g, "label": l, "alert": a} for g, l, _rx, a in topics],
         "monthly": monthly,
         "daily": daily,
         "posts": posts,
