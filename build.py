@@ -12,6 +12,7 @@
 """
 
 import json
+import os
 import re
 import html
 import sys
@@ -20,6 +21,7 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 SOURCE = "https://ix.cnn.io/data/truth-social/truth_archive.json"
+OCR_FILE = "ocr.json"
 ET = ZoneInfo("America/New_York")
 EARLIEST = datetime(2026, 1, 1, tzinfo=timezone.utc)
 WINDOW_DAYS = 365
@@ -55,6 +57,14 @@ def main() -> int:
     start = max(EARLIEST, now - timedelta(days=WINDOW_DAYS))
     print(f"  取用區間 {start.date()} 起")
 
+    # 圖片文字（由 ocr.py 產生）。有三分之一的貼文只有圖沒有字，
+    # 把辨識出來的文字併進來，那些貼文才進得了關鍵字統計。
+    ocr = {}
+    if os.path.exists(OCR_FILE):
+        with open(OCR_FILE, encoding="utf-8") as f:
+            ocr = json.load(f).get("texts", {})
+    print(f"  圖片文字 {sum(1 for v in ocr.values() if v):,} 張有內容 / 共辨識 {len(ocr):,} 張")
+
     with open("topics.json", encoding="utf-8") as f:
         cfg = json.load(f)
     topics = compile_topics(cfg)
@@ -79,9 +89,15 @@ def main() -> int:
         joined = " ".join(media)
         kind = 1 if (media and not text) else (2 if media else 0)
 
+        img_text = " ".join(
+            t for t in (ocr.get(f"{x['id']}:{i}", "") for i in range(len(media))) if t
+        ).strip()
+        # 關鍵字比對時把圖片文字一起算進去
+        haystack = (text + " " + img_text).strip()
+
         # 主題以索引陣列儲存，不用位元遮罩：主題數已超過 JavaScript
         # 位元運算的 32 位元上限，用陣列才不會在瀏覽器端算錯。
-        hits = [i for i, (_g, _l, rx, _a) in enumerate(topics) if text and rx.search(text)]
+        hits = [i for i, (_g, _l, rx, _a) in enumerate(topics) if haystack and rx.search(haystack)]
 
         flags = 0
         if re.match(r"^RT @", text):
@@ -101,6 +117,7 @@ def main() -> int:
             int(x.get("replies_count") or 0),
             hits,
             flags,
+            img_text,
         ])
 
     posts.sort(key=lambda p: p[1], reverse=True)
@@ -135,6 +152,7 @@ def main() -> int:
         "archive_total": len(raw),
         "range": [posts[-1][1][:10], posts[0][1][:10]],
         "days_span": days_span,
+        "ocr": {"scanned": len(ocr), "with_text": sum(1 for v in ocr.values() if v)},
         "topics": [{"group": g, "label": l, "alert": a} for g, l, _rx, a in topics],
         "monthly": monthly,
         "daily": daily,
@@ -144,7 +162,6 @@ def main() -> int:
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
-    import os
     size = os.path.getsize("data.json")
     print(f"寫出 data.json：{len(posts):,} 則、{size/1024/1024:.2f} MB")
     print(f"  區間 {data['range'][0]} 至 {data['range'][1]}（{days_span} 天）")

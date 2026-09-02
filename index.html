@@ -157,6 +157,15 @@ select{font:inherit;font-size:13.5px;padding:9px 11px;background:var(--surface);
            overflow-wrap:anywhere;margin:0}
 .post .txt mark{background:var(--accent-soft);color:inherit;padding:0 2px}
 .post .none{color:var(--ink-3);font-style:italic;font-size:14px}
+.post .ocr{margin:9px 0 0;padding:9px 12px;background:var(--surface-2);
+           border-left:2px solid var(--rule-2);font-family:var(--mono);font-size:13.5px;
+           line-height:1.6;color:var(--ink-2);overflow-wrap:anywhere}
+.post .ocr span{display:block;font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+                color:var(--ink-3);margin-bottom:4px}
+.post .ocr mark{background:var(--accent-soft);color:inherit;padding:0 2px}
+.scope p{margin:0 0 14px;font-size:14.5px;line-height:1.75;color:var(--ink-2)}
+.scope p:last-child{margin-bottom:0}
+.scope b{color:var(--ink);font-weight:700}
 .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:11px;font-size:12px;color:var(--ink-3);
       align-items:center;font-variant-numeric:tabular-nums}
 .badge{font-size:11px;padding:2px 8px;border:1px solid var(--rule-2);border-radius:999px;color:var(--ink-2)}
@@ -274,6 +283,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
 
   /* ---------- 統計條 ---------- */
   var mediaOnly = POSTS.filter(function(p){ return p[3] === 1; }).length;
+  var videoCount = POSTS.filter(function(p){ return (p[8] & 2) !== 0; }).length;
   var twTotal = TWIDX >= 0 ? total('台灣') : 0;
   var countryTops = TOPICS.filter(function(t){ return t.group === '國家與地區' && t.label !== '台灣'; })
       .map(function(t){ return [t.label, total(t.label)]; })
@@ -346,6 +356,21 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
    '<span class="hint">直接比對貼文原文，不分大小寫。加進去的關鍵字會用金色顯示。</span>' +
    '</div>' +
    '<div id="chart"></div><div class="legend" id="legend"></div></div></section>' +
+
+   '<section><h2>統計範圍與限制</h2>' +
+   '<p class="sub">這個追蹤器算到哪裡，以及哪些東西不在統計之內。</p>' +
+   '<div class="panel scope">' +
+   '<p><b>算進去的　</b>所有貼文的文字內容，加上圖片中經機器辨識、品質足夠的文字。目前已掃描 ' +
+   (D.ocr ? D.ocr.scanned.toLocaleString() : 0) + ' 張圖片，其中 ' +
+   (D.ocr ? D.ocr.with_text.toLocaleString() : 0) + ' 張抓到可用文字，這些文字一併納入關鍵字比對，' +
+   '也會顯示在下方的貼文卡片裡。</p>' +
+   '<p><b>沒算進去的　</b>影片完全不在統計範圍內，' + videoCount.toLocaleString() +
+   ' 則含影片的貼文，畫面與聲音都沒有分析。圖片中的藝術字、迷因合成字、手寫字與過度變形的字體，' +
+   '機器辨識不出來的一律捨棄，寧可漏掉也不把錯誤的字餵進統計。</p>' +
+   '<p><b>主題怎麼判定　</b>用關鍵字比對，不是語意理解。「中國」這一組會抓 China、Chinese、Beijing、CCP，' +
+   '但抓不到只用代稱而沒點名的句子；反過來，同形異義的字偶爾會誤判。台灣與半導體相關的結果已全部人工複核。</p>' +
+   '<p><b>時間基準　</b>一律用美東時間，因為那是他按下發送當下的在地時間。</p>' +
+   '</div></section>' +
 
    '<section><h2>全文檢索</h2>' +
    '<p class="sub">' + POSTS.length.toLocaleString() + ' 則貼文的完整內文都在這裡，篩選可以疊加使用。</p>' +
@@ -545,7 +570,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
     term = q.value.trim();
     var lower = term.toLowerCase(), ti = +topicSel.value, ki = +kindSel.value, mo = monthSel.value;
     filtered = POSTS.filter(function(p){
-      if (lower && (!p[2] || p[2].toLowerCase().indexOf(lower) < 0)) return false;
+      if (lower && ((p[2] || '') + ' ' + (p[9] || '')).toLowerCase().indexOf(lower) < 0) return false;
       if (ti === -2 && !isAlert(p)) return false;
       if (ti >= 0 && p[7].indexOf(ti) < 0) return false;
       if (ki >= 0 && p[3] !== ki) return false;
@@ -576,6 +601,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
         dt.slice(5,10).replace('-','/') + '</span>' + dt.slice(11) + ' ET</div><div class="body">' +
         (p[2] ? '<p class="txt">' + highlight(p[2], term) + '</p>'
               : '<p class="txt none">（沒有文字，' + ((p[8]&2)?'影片':'圖片') + '貼文）</p>') +
+        (p[9] ? '<p class="ocr"><span>圖片文字 · 機器辨識</span>' + highlight(p[9], term) + '</p>' : '') +
         '<div class="meta"><span>' + KINDNAME[p[3]] + '</span>' +
         '<span>讚 ' + p[4].toLocaleString() + '</span><span>轉 ' + p[5].toLocaleString() +
         '</span><span>回 ' + p[6].toLocaleString() + '</span>' + tags.join('') +
