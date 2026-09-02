@@ -324,7 +324,9 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
   });
   var days = [], d0 = new Date(D.range[0] + 'T00:00:00'), d1 = new Date(D.range[1] + 'T00:00:00');
   for (var d = new Date(d0); d <= d1; d.setDate(d.getDate()+1)){
-    var key = d.toISOString().slice(0,10);
+    // 用本地日期組字串，不能用 toISOString：在 UTC+8 會整批位移一天
+    var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') +
+              '-' + String(d.getDate()).padStart(2,'0');
     days.push([key, D.daily[key] || 0]);
   }
   var maxDay = days.reduce(function(m,x){ return Math.max(m, x[1]); }, 1);
