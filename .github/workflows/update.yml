@@ -1,0 +1,43 @@
+name: 更新貼文資料
+
+on:
+  schedule:
+    # 每 6 小時一次（UTC 0/6/12/18 點，約當台北時間 08/14/20/02 點）
+    - cron: "20 0,6,12,18 * * *"
+  workflow_dispatch:        # 也可以在 Actions 分頁手動按一下立刻更新
+  push:
+    paths:
+      - topics.json         # 改了關鍵字設定就立刻重算
+      - build.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 抓取並重新計算
+        run: python build.py
+
+      - name: 有變動才提交
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- data.json; then
+            echo "資料沒有變化，不提交。"
+          else
+            git add data.json
+            git commit -m "自動更新資料 $(TZ=Asia/Taipei date '+%Y-%m-%d %H:%M')"
+            git push
+          fi

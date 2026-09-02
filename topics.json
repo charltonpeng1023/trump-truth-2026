@@ -1,0 +1,102 @@
+{
+  "_說明": "主題關鍵字設定檔。要新增主題，在對應的 group 裡加一筆 {label, pattern} 就好，不用改程式。pattern 是正規表達式，預設不分大小寫；需要區分大小寫（例如 ICE）就加 \"cs\": true。改完 commit，下次自動更新就會生效。",
+  "groups": [
+    {
+      "name": "國家與地區",
+      "topics": [
+        { "label": "台灣", "pattern": "\\btaiwan|\\btaiwanese\\b|\\btsmc\\b|taipei economic" },
+        { "label": "中國", "pattern": "\\bchina\\b|\\bchinese\\b|\\bbeijing\\b|\\bccp\\b" },
+        { "label": "伊朗", "pattern": "\\biran\\b|\\biranian\\b|\\btehran\\b|islamic republic" },
+        { "label": "以色列", "pattern": "\\bisrael" },
+        { "label": "加薩與巴勒斯坦", "pattern": "\\bgaza\\b|\\bhamas\\b|palestin|\\bwest bank\\b" },
+        { "label": "俄羅斯", "pattern": "\\brussia|\\bmoscow\\b|\\bkremlin\\b" },
+        { "label": "烏克蘭", "pattern": "\\bukrain" },
+        { "label": "委內瑞拉", "pattern": "\\bvenezuela" },
+        { "label": "加拿大", "pattern": "\\bcanada\\b|\\bcanadian" },
+        { "label": "墨西哥", "pattern": "\\bmexic" },
+        { "label": "格陵蘭與丹麥", "pattern": "\\bgreenland\\b|\\bdenmark\\b|\\bdanish\\b" },
+        { "label": "巴拿馬運河", "pattern": "panama canal|\\bpanama\\b" },
+        { "label": "日本", "pattern": "\\bjapan" },
+        { "label": "南韓", "pattern": "south korea|\\bkorean?\\b" },
+        { "label": "北韓", "pattern": "north korea|kim jong" },
+        { "label": "印度", "pattern": "\\bindia\\b|\\bindian\\b" },
+        { "label": "歐盟", "pattern": "european union|\\beurope\\b|\\beu\\b" },
+        { "label": "英國", "pattern": "united kingdom|\\bbritain\\b|\\bbritish\\b|\\bengland\\b|\\bscotland\\b" },
+        { "label": "德國", "pattern": "\\bgermany\\b|\\bgerman\\b" },
+        { "label": "法國", "pattern": "\\bfrance\\b|\\bfrench\\b" },
+        { "label": "義大利", "pattern": "\\bitaly\\b|\\bitalian\\b" },
+        { "label": "沙烏地與波灣", "pattern": "saudi|\\bqatar\\b|united arab emirates|\\buae\\b|\\bbahrain\\b|\\bkuwait\\b" },
+        { "label": "巴基斯坦", "pattern": "\\bpakistan" },
+        { "label": "阿富汗", "pattern": "\\bafghan" },
+        { "label": "巴西", "pattern": "\\bbrazil|\\bbolsonaro\\b|\\blula\\b" },
+        { "label": "NATO", "pattern": "\\bnato\\b" }
+      ]
+    },
+    {
+      "name": "議題",
+      "topics": [
+        { "label": "關稅與貿易", "pattern": "\\btariff|trade deficit|trade deal|section 232|reciprocal trade|\\bimports?\\b" },
+        { "label": "半導體與晶片", "pattern": "semiconductor|\\bchips?\\b|\\bfoundry\\b|\\bwafer\\b|\\bintel\\b|\\bnvidia\\b|\\bmicron\\b" },
+        { "label": "期中選舉", "pattern": "\\bmidterm|primary election|congressional district|running for (the )?(u\\.s\\.|united states )?(senate|congress|governor)|\\bballot\\b|\\bvoters?\\b" },
+        { "label": "最高法院", "pattern": "supreme court|\\bscotus\\b|gorsuch|barrett|kavanaugh" },
+        { "label": "移民與遣返", "pattern": "\\bimmigration\\b|\\bimmigrant|deportation|deport\\b|illegal alien|\\bmigrant|border patrol|birthright citizenship" },
+        { "label": "ICE 與執法", "pattern": "\\bICE\\b|homeland security|law enforcement|national guard", "cs": true },
+        { "label": "城市治安與國民兵", "pattern": "national guard|\\bcrime\\b|\\bantifa\\b|\\briots?\\b|insurrection" },
+        { "label": "選舉舞弊指控", "pattern": "voter id|\\bvoter fraud|rigged election|mail-in ballot|election integrity|\\bcheaters?\\b" },
+        { "label": "假新聞與媒體攻擊", "pattern": "fake news|failing new york times|\\bcnn\\b|\\bmsnbc\\b|washington post|wall street journal|\\bpolls?\\b.{0,20}fake" },
+        { "label": "通膨與物價", "pattern": "\\binflation\\b|\\bprices?\\b|affordab|cost of living|\\bgroceries\\b" },
+        { "label": "股市", "pattern": "stock market|\\bdow\\b|\\bs&p\\b|\\bnasdaq\\b|record high" },
+        { "label": "聯準會與利率", "pattern": "\\bfed\\b|federal reserve|interest rates?|\\bpowell\\b" },
+        { "label": "能源與油價", "pattern": "\\boil\\b|\\bgas prices?\\b|\\bdrill|\\benergy\\b|\\bcrude\\b|\\bwti\\b" },
+        { "label": "加密貨幣", "pattern": "\\bcrypto|\\bbitcoin\\b|digital asset" },
+        { "label": "荷姆茲海峽", "pattern": "hormuz|strait of" },
+        { "label": "核武", "pattern": "\\bnuclear\\b|\\benrichment\\b|\\bjcpoa\\b|\\buranium\\b" },
+        { "label": "戰爭與軍事行動", "pattern": "\\bwar\\b|\\bmilitary\\b|\\bstrikes?\\b|\\bblockade\\b|ceasefire|cease fire|\\bobliterat" },
+        { "label": "和平協議", "pattern": "peace deal|peace agreement|\\bpeace\\b|\\bsurrender\\b|\\btreaty\\b" },
+        { "label": "健保與藥價", "pattern": "\\bdrug prices?\\b|prescription|\\bmedicare\\b|\\bmedicaid\\b|\\bhealthcare\\b|trumprx" },
+        { "label": "製造業回流", "pattern": "made in the u\\.s\\.a|manufacturing|\\bfactory\\b|\\bfactories\\b|reshor|\\bjobs?\\b" },
+        { "label": "AI 與科技", "pattern": "\\bartificial intelligence\\b|\\bai\\b|data center|\\bapple\\b|\\bgoogle\\b|\\btiktok\\b" },
+        { "label": "司法與訴訟", "pattern": "\\bindict|\\bwitch ?hunt\\b|\\blawfare\\b|\\bprosecutor|\\bjudge\\b|\\bgrand jury\\b" }
+      ]
+    },
+    {
+      "name": "人物",
+      "topics": [
+        { "label": "拜登", "pattern": "\\bbiden\\b|sleepy joe|barack hussein" },
+        { "label": "歐巴馬", "pattern": "\\bobama\\b|\\bobuma\\b" },
+        { "label": "希拉蕊", "pattern": "hillary|\\bclinton\\b" },
+        { "label": "賀錦麗", "pattern": "\\bharris\\b|\\bkamala\\b" },
+        { "label": "裴洛西", "pattern": "\\bpelosi\\b" },
+        { "label": "舒默", "pattern": "\\bschumer\\b" },
+        { "label": "傑福瑞斯", "pattern": "\\bjeffries\\b" },
+        { "label": "紐森", "pattern": "\\bnewsom\\b" },
+        { "label": "桑德斯", "pattern": "bernie|\\bsanders\\b" },
+        { "label": "馬斯克", "pattern": "\\bmusk\\b|\\belon\\b" },
+        { "label": "鮑爾（聯準會）", "pattern": "\\bpowell\\b|too late" },
+        { "label": "范斯", "pattern": "\\bvance\\b" },
+        { "label": "赫格塞斯", "pattern": "hegseth" },
+        { "label": "魯比歐", "pattern": "\\brubio\\b" },
+        { "label": "強生（議長）", "pattern": "mike johnson|speaker johnson" },
+        { "label": "習近平", "pattern": "\\bxi\\b|xi jinping|president xi" },
+        { "label": "普丁", "pattern": "\\bputin\\b" },
+        { "label": "澤倫斯基", "pattern": "zelensk" },
+        { "label": "納坦雅胡", "pattern": "netanyahu" },
+        { "label": "哈梅內伊", "pattern": "khamenei|ayatollah" },
+        { "label": "索羅斯", "pattern": "\\bsoros\\b" },
+        { "label": "教宗", "pattern": "\\bpope\\b" },
+        { "label": "激進左派", "pattern": "radical left|\\bdumocrat|\\bdemocrat" },
+        { "label": "RINO 與黨內敵人", "pattern": "\\brino\\b|\\brinos\\b|liz cheney|mitch mcconnell|\\bromney\\b" }
+      ]
+    },
+    {
+      "name": "語氣",
+      "topics": [
+        { "label": "攻擊性用語", "pattern": "radical left|fake news|\\bcorrupt|\\bfailed\\b|\\bloser|\\blunatic|\\bcrooked\\b|\\bincompetent\\b|\\bstupid\\b|\\bidiot|\\bmoron|\\bhoax|witch ?hunt|\\bdisaster|\\bnasty\\b|\\bsleaz|\\bweak\\b|\\bhorrible\\b|\\bterrible\\b|\\bscam|\\btraitor|\\bdumb" },
+        { "label": "粗俗用語", "pattern": "\\bhell\\b|\\bdamn|\\bass(es|hole|holes)?\\b|\\bshit|\\bbastard|\\bcrap\\b|\\bsucks?\\b|\\bfuck|son of a bitch|\\bscum" },
+        { "label": "全大寫吼叫", "pattern": "\\b[A-Z]{4,}\\b.{0,40}\\b[A-Z]{4,}\\b", "cs": true },
+        { "label": "自我署名", "pattern": "President DONALD J\\. TRUMP|President DJT", "cs": true },
+        { "label": "背書表態", "pattern": "complete and total endorsement|\\bendorse" }
+      ]
+    }
+  ]
+}
