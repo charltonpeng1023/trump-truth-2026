@@ -318,7 +318,7 @@ footer code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
     stat(POSTS.length.toLocaleString(), '追蹤中貼文則數') +
     stat(perDay, '平均每天則數') +
     stat(last7.toLocaleString(), '最近 7 天則數') +
-    stat(top1[1].toLocaleString(), '提到' + top1[0] + '的則數') +
+    stat(top1[1].toLocaleString(), '最常提到的國家：' + top1[0]) +
     stat((mediaOnly/POSTS.length*100).toFixed(1) + '%', '完全沒有文字的貼文') +
     '</div>';
   function stat(n, l, hot){
