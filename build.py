@@ -26,6 +26,24 @@ ET = ZoneInfo("America/New_York")
 EARLIEST = datetime(2026, 1, 1, tzinfo=timezone.utc)
 WINDOW_DAYS = 365
 
+# 「語氣」這一組統計的是川普自己怎麼寫字，所以只比對他打出來的內文，
+# 不把圖片裡辨識到的字算進去（新聞截圖和迷因本來就常常整排大寫）。
+TEXT_ONLY_GROUP = "語氣"
+
+# OCR 難免有雜訊。用常見英文字的比例當門檻，比例太低的多半是把
+# 圖形當成字，整段捨棄，寧可漏掉也不要餵錯的字進統計。
+COMMON = set("""the and of to in a is that for on with it as was are by this be from at
+have has not will you we he his they said but all new their who more one out about up
+than over into after been can if no now our us what when which would""".split())
+MIN_COMMON_RATIO = 0.10
+
+
+def usable(t: str) -> bool:
+    words = re.findall(r"[a-z\']+", t.lower())
+    if len(words) < 5:
+        return False
+    return sum(1 for w in words if w in COMMON) / len(words) >= MIN_COMMON_RATIO
+
 
 def fetch(url: str) -> list:
     req = urllib.request.Request(url, headers={"User-Agent": "trump-truth-2026/1.0"})
@@ -90,14 +108,19 @@ def main() -> int:
         kind = 1 if (media and not text) else (2 if media else 0)
 
         img_text = " ".join(
-            t for t in (ocr.get(f"{x['id']}:{i}", "") for i in range(len(media))) if t
+            t for t in (ocr.get(f"{x['id']}:{i}", "") for i in range(len(media)))
+            if t and usable(t)
         ).strip()
         # 關鍵字比對時把圖片文字一起算進去
         haystack = (text + " " + img_text).strip()
 
         # 主題以索引陣列儲存，不用位元遮罩：主題數已超過 JavaScript
         # 位元運算的 32 位元上限，用陣列才不會在瀏覽器端算錯。
-        hits = [i for i, (_g, _l, rx, _a) in enumerate(topics) if haystack and rx.search(haystack)]
+        hits = []
+        for i, (g, _l, rx, _a) in enumerate(topics):
+            target = text if g == TEXT_ONLY_GROUP else haystack
+            if target and rx.search(target):
+                hits.append(i)
 
         flags = 0
         if re.match(r"^RT @", text):
@@ -152,7 +175,8 @@ def main() -> int:
         "archive_total": len(raw),
         "range": [posts[-1][1][:10], posts[0][1][:10]],
         "days_span": days_span,
-        "ocr": {"scanned": len(ocr), "with_text": sum(1 for v in ocr.values() if v)},
+        "ocr": {"scanned": len(ocr),
+                "with_text": sum(1 for v in ocr.values() if v and usable(v))},
         "topics": [{"group": g, "label": l, "alert": a} for g, l, _rx, a in topics],
         "monthly": monthly,
         "daily": daily,
